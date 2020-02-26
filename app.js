@@ -6,20 +6,20 @@ Http.listen(3000, () => {
   console.log("port 3000")
 });
 
-let point = 5
-
 var board = [
-  [ 1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
-  [ 1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-  [ 1, 0, 1, 1, 1, 1, 0, 0, 1, 1],
-  [ 1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-  [ 1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
-  [ 1, 0, 0, 0, 1, 1, 1, 0, 1, 1],
-  [ 1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
-  [ 1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
-  [ 1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
-  [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],
+  [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+  [1, 0, 1, 1, 1, 1, 0, 0, 1, 1],
+  [1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+  [1, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+  [1, 0, 0, 0, 1, 1, 1, 0, 1, 1],
+  [1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
+  [1, 0, 1, 0, 1, 0, 1, 0, 0, 1],
+  [1, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ];
+var width = 640
+var blockSize = width / board.length;
 
 var players = {}
 
@@ -34,7 +34,7 @@ Socketio.on("connection", socket => {
   })
 
 
-  
+
 
   socket.on("disconnect", () => {
     delete (players[socket.id])
@@ -44,39 +44,33 @@ Socketio.on("connection", socket => {
     var player = players[socket.id] || {}
     switch (data) {
       case "left":
-        // sendOldPosition(player)
         Socketio.emit('maze', board)
-        if (!findElementByX(player.x - 20, player.y, socket.id)) {
-          player.x -= 5;
+        if (!findElementByX(player.x - 20, player.y, socket.id) && canMove(player.x - 5, player.y)) {
+          player.x -= 5
         } else {
           player.x += 10;
         }
         Socketio.emit('state', players)
         break;
       case "right":
-        // sendOldPosition(player)
         Socketio.emit('maze', board)
-        if (!findElementByX(player.x + 20, player.y, socket.id)) {
-          player.x += 5;
+        if (!findElementByX(player.x + 20, player.y, socket.id) && canMove(player.x + 25, player.y)) {
+          player.x += 5
         } else player.x -= 10;
         Socketio.emit('state', players)
         break;
       case "up":
-        // sendOldPosition(player)
         Socketio.emit('maze', board)
-        if (!findElementByY(player.y - 20, player.x, socket.id)) {
+        if (!findElementByY(player.y - 20, player.x, socket.id) && canMove(player.x, player.y - 5)) {
           player.y -= 5;
         } else player.y += 10;
         Socketio.emit('state', players)
         break;
       case "down":
-        // sendOldPosition(player)
         Socketio.emit('maze', board)
-        if (!findElementByY(player.y + 20, player.x, socket.id)) {
+        if (!findElementByY(player.y + 20, player.x, socket.id) && canMove(player.x, player.y + 25)) {
           player.y += 5;
         } else player.y -= 10;
-        // position.y = position.y + 5;
-        // Socketio.emit("position", { pos: players[socket.id], direction: "down" })
         Socketio.emit('state', players)
         break;
     }
@@ -115,4 +109,9 @@ function findElementByY(coordinateY, coordinateX, id) {
     }
   }
   return false
+}
+
+function canMove(x, y) {
+  return (y >= 0) && (y <= 640) && (x >= 0) && (x <= 640)
+  //&& (board[y][x] != 1);
 }
