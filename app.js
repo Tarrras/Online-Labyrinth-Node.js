@@ -112,6 +112,9 @@ function findElementByY(coordinateY, coordinateX, id) {
 }
 
 function canMove(x, y) {
-  return (y >= 0) && (y <= 640) && (x >= 0) && (x <= 640)
-  //&& (board[y][x] != 1);
+  return (y >= 0) && (y <= width) && (x >= 0) && (x <= width) && canMoveThrough(x, y)
+}
+
+function canMoveThrough(coordinateX, coordinateY) {
+  return (board[Math.trunc(coordinateY / blockSize)][Math.trunc(coordinateX / blockSize)] == 0)
 }
