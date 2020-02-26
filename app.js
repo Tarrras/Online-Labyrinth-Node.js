@@ -33,6 +33,7 @@ Socketio.on("connection", socket => {
     Socketio.emit('maze', board)
   })
 
+
   
 
   socket.on("disconnect", () => {
@@ -43,26 +44,40 @@ Socketio.on("connection", socket => {
     var player = players[socket.id] || {}
     switch (data) {
       case "left":
+        // sendOldPosition(player)
+        Socketio.emit('maze', board)
         if (!findElementByX(player.x - 20, player.y, socket.id)) {
           player.x -= 5;
-        } else player.x += 10;
+        } else {
+          player.x += 10;
+        }
+        Socketio.emit('state', players)
         break;
       case "right":
+        // sendOldPosition(player)
+        Socketio.emit('maze', board)
         if (!findElementByX(player.x + 20, player.y, socket.id)) {
           player.x += 5;
         } else player.x -= 10;
+        Socketio.emit('state', players)
         break;
       case "up":
+        // sendOldPosition(player)
+        Socketio.emit('maze', board)
         if (!findElementByY(player.y - 20, player.x, socket.id)) {
           player.y -= 5;
         } else player.y += 10;
+        Socketio.emit('state', players)
         break;
       case "down":
+        // sendOldPosition(player)
+        Socketio.emit('maze', board)
         if (!findElementByY(player.y + 20, player.x, socket.id)) {
           player.y += 5;
         } else player.y -= 10;
         // position.y = position.y + 5;
         // Socketio.emit("position", { pos: players[socket.id], direction: "down" })
+        Socketio.emit('state', players)
         break;
     }
   });
@@ -72,6 +87,10 @@ setInterval(() => {
   Socketio.emit('state', players)
 }, 1000 / 60)
 
+
+function sendOldPosition(position) {
+  Socketio.emit('old', position)
+}
 
 
 function findElementByX(coordinateX, coordinateY, id) {
